@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "33668657719",
+    "project_id": "evently-c20-abbas",
+    "storage_bucket": "evently-c20-abbas.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:33668657719:android:9a53ba9f9bff3f49bcc5b2",
+        "android_client_info": {
+          "package_name": "com.example.evently_app_abbas"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBlSjYiNzgMY5QnssN5SIIH8wT4erkwC3A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

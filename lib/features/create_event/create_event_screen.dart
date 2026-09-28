@@ -1,11 +1,16 @@
 import 'package:evently_app_abbas/core/extensions/date_time_ex.dart';
 import 'package:evently_app_abbas/core/sources/assets_manager.dart';
 import 'package:evently_app_abbas/core/sources/colors_manager.dart';
+import 'package:evently_app_abbas/core/utils/dialog_utils.dart';
 import 'package:evently_app_abbas/core/widgets/custom_elevted_button.dart';
 import 'package:evently_app_abbas/core/widgets/custom_tab_bar.dart';
 import 'package:evently_app_abbas/core/widgets/custom_text_form_field.dart';
 import 'package:evently_app_abbas/core/widgets/cutom_text_button.dart';
+import 'package:evently_app_abbas/firebase_service/firebase_services.dart';
+import 'package:evently_app_abbas/l10n/app_localizations.dart';
 import 'package:evently_app_abbas/models/category_model.dart';
+import 'package:evently_app_abbas/models/event_mode.dart';
+import 'package:evently_app_abbas/models/user_model.dart';
 import 'package:flutter/material.dart';
 
 class CreateEventScreen extends StatefulWidget {
@@ -20,11 +25,30 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
   /// 14-9-2026 , 6:01:00:000
   TimeOfDay currentTime = TimeOfDay.now();
+  late TextEditingController titleController;
+  late TextEditingController desController;
+  CategoryModel selectedCategory = CategoryModel.categories[0];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    titleController = TextEditingController();
+    desController = TextEditingController();
+  }
+  @override
+  void dispose() {
+   titleController.dispose();
+   desController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    AppLocalizations appLocalizations = AppLocalizations.of(context)!;
+
     return Scaffold(
-      appBar: AppBar(title: Text("Add Event")),
+     // resizeToAvoidBottomInset: true,
+      appBar: AppBar(title: Text(appLocalizations.add_event)),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16),
         child: Column(
@@ -43,6 +67,13 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             ),
             SizedBox(height: 16),
             CustomTabBar(
+              onSelectedCategoryClicked: (category){
+
+                setState(() {
+                  selectedCategory = category;
+                });
+
+              },
               categories: CategoryModel.categories,
               selectedBgColor: ColorsManager.darkBlue,
               selectedFgColor: ColorsManager.white,
@@ -50,16 +81,20 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               unSelectedFgColor: ColorsManager.black,
             ),
             SizedBox(height: 16),
-            Text("Title", style: Theme.of(context).textTheme.displaySmall),
+            Text(appLocalizations.event_title, style: Theme.of(context).textTheme.displaySmall),
             SizedBox(height: 8),
-            CustomTextFormField(hintText: "Event Title"),
+            CustomTextFormField(
+                controller: titleController,
+                hintText: appLocalizations.event_title),
             SizedBox(height: 16),
             Text(
-              "Description",
+              appLocalizations.description,
               style: Theme.of(context).textTheme.displaySmall,
             ),
             SizedBox(height: 8),
-            CustomTextFormField(hintText: "Event Description...", lines: 4),
+            CustomTextFormField(
+                controller: desController,
+                hintText: appLocalizations.event_description, lines: 4),
             SizedBox(height: 16),
             Row(
               children: [
@@ -70,7 +105,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   style: Theme.of(context).textTheme.displaySmall,
                 ),
                 Spacer(),
-                CustomTextButton(text: "Choose Date", onTap: _chooseEventDate),
+                CustomTextButton(text: appLocalizations.choose_date, onTap: _chooseEventDate),
               ],
             ),
             SizedBox(height: 16),
@@ -83,16 +118,26 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   style: Theme.of(context).textTheme.displaySmall,
                 ),
                 Spacer(),
-                CustomTextButton(text: "Choose Time", onTap: _chooseEventTime),
+                CustomTextButton(text: appLocalizations.choose_time, onTap: _chooseEventTime),
               ],
             ),
 
             Spacer(),
-            CustomElevatedButton(title: "Add Event", onPress: () {}),
+            CustomElevatedButton(title: appLocalizations.add_event, onPress:_addEVent),
           ],
         ),
       ),
     );
+  }
+
+  void _addEVent()async{
+    EventModel event = EventModel(ownerId: UserModel.loggedInUser!.id,id: "", category: selectedCategory, title: titleController.text, description: desController.text, dateTime: currentDateTime);
+  DialogUtils.showLoading(context, dismissible: false);
+    await FirebaseServices.addEventToFireStore(event);
+    DialogUtils.hideDialog(context);
+    DialogUtils.showToast("Event Created", Colors.green);
+    Navigator.pop(context);
+
   }
 
   void _chooseEventDate() async {

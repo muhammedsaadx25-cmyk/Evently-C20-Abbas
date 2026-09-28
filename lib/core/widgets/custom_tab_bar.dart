@@ -1,16 +1,18 @@
+
 import 'package:evently_app_abbas/core/sources/colors_manager.dart';
 import 'package:evently_app_abbas/core/widgets/custom_tab_item.dart';
 import 'package:evently_app_abbas/models/category_model.dart';
 import 'package:flutter/material.dart';
 
 class CustomTabBar extends StatefulWidget {
-   CustomTabBar({super.key, required this.categories, required this.selectedBgColor, required this.selectedFgColor, required this.unSelectedBgColor, required this.unSelectedFgColor});
+   CustomTabBar({super.key, required this.categories, required this.selectedBgColor, required this.selectedFgColor, required this.unSelectedBgColor, required this.unSelectedFgColor, this.onSelectedCategoryClicked});
 List<CategoryModel> categories;
 
    Color selectedBgColor;
    Color unSelectedBgColor;
    Color selectedFgColor;
    Color unSelectedFgColor;
+   void Function(CategoryModel)? onSelectedCategoryClicked;
 
   @override
   State<CustomTabBar> createState() => _CustomTabBarState();
@@ -27,6 +29,7 @@ class _CustomTabBarState extends State<CustomTabBar> {
         onTap: (newIndex){
           setState(() {
             selectedIndex = newIndex;
+            widget.onSelectedCategoryClicked?.call(widget.categories[selectedIndex]);
           });
         },
         tabAlignment: TabAlignment.start,
